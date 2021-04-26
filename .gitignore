@@ -1,16 +1,69 @@
-# macOS
-.DS_Store
+# Build results
+/target
+
+# Cargo+Git helper file (https://github.com/rust-lang/cargo/blob/0.44.1/src/cargo/sources/git/utils.rs#L320-L327)
+.cargo-ok
 
 # Text file backups
 **/*.rs.bk
 
-# Build results
-target/
+# macOS
+.DS_Store
 
 # IDEs
-.vscode/
-.idea/
 *.iml
+.idea
 
-# Auto-gen
-.cargo-ok
+# Environment
+*.env
+
+# Scripts
+node_modules/
+
+# Artifacts
+artifacts/
+
+
+
+#
+#
+#
+# denom is string, reserve is the struct 
+# reserves_state(&mut deps.storage).save(&denom.as_bytes(), &reserve)?;
+# reserves = reserves_state(&mut deps.storage)
+# reserves.may_load(denom.as_bytes())
+# reserve = state.load(&id.as_bytes())?;
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#

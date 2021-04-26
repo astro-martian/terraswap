@@ -16,11 +16,7 @@ use terraswap::token::InitMsg;
 const CONTRACT_NAME: &str = "crates.io:cw20-base";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
-pub fn init<S: Storage, A: Api, Q: Querier>(
-    deps: &mut Extern<S, A, Q>,
-    _env: Env,
-    msg: InitMsg,
-) -> StdResult<InitResponse> {
+pub fn init<S: Storage, A: Api, Q: Querier>( deps: &mut Extern<S, A, Q>, _env: Env, msg: InitMsg,) -> StdResult<InitResponse> {
     set_contract_version(&mut deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
     // Check valid token info
@@ -69,25 +65,14 @@ pub fn init<S: Storage, A: Api, Q: Querier>(
     }
 }
 
-pub fn handle<S: Storage, A: Api, Q: Querier>(
-    deps: &mut Extern<S, A, Q>,
-    env: Env,
-    msg: HandleMsg,
-) -> HandleResult {
+pub fn handle<S: Storage, A: Api, Q: Querier>(  deps: &mut Extern<S, A, Q>,  env: Env,  msg: HandleMsg,) -> HandleResult {
     cw20_handle(deps, env, msg)
 }
 
-pub fn migrate<S: Storage, A: Api, Q: Querier>(
-    deps: &mut Extern<S, A, Q>,
-    env: Env,
-    msg: MigrateMsg,
-) -> MigrateResult {
+pub fn migrate<S: Storage, A: Api, Q: Querier>(  deps: &mut Extern<S, A, Q>,  env: Env,  msg: MigrateMsg,) -> MigrateResult {
     cw20_migrate(deps, env, msg)
 }
 
-pub fn query<S: Storage, A: Api, Q: Querier>(
-    deps: &Extern<S, A, Q>,
-    msg: QueryMsg,
-) -> StdResult<Binary> {
+pub fn query<S: Storage, A: Api, Q: Querier>(  deps: &Extern<S, A, Q>,  msg: QueryMsg,) -> StdResult<Binary> {
     cw20_query(deps, msg)
 }

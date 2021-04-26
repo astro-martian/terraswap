@@ -12,11 +12,7 @@ use terraswap::factory::{ConfigResponse, HandleMsg, InitMsg, MigrateMsg, PairsRe
 use terraswap::hook::InitHook;
 use terraswap::pair::InitMsg as PairInitMsg;
 
-pub fn init<S: Storage, A: Api, Q: Querier>(
-    deps: &mut Extern<S, A, Q>,
-    env: Env,
-    msg: InitMsg,
-) -> StdResult<InitResponse> {
+pub fn init<S: Storage, A: Api, Q: Querier>( deps: &mut Extern<S, A, Q>, env: Env, msg: InitMsg,) -> StdResult<InitResponse> {
     let config = Config {
         owner: deps.api.canonical_address(&env.message.sender)?,
         token_code_id: msg.token_code_id,
@@ -40,33 +36,16 @@ pub fn init<S: Storage, A: Api, Q: Querier>(
     })
 }
 
-pub fn handle<S: Storage, A: Api, Q: Querier>(
-    deps: &mut Extern<S, A, Q>,
-    env: Env,
-    msg: HandleMsg,
-) -> HandleResult {
+pub fn handle<S: Storage, A: Api, Q: Querier>( deps: &mut Extern<S, A, Q>, env: Env, msg: HandleMsg,) -> HandleResult {
     match msg {
-        HandleMsg::UpdateConfig {
-            owner,
-            token_code_id,
-            pair_code_id,
-        } => try_update_config(deps, env, owner, token_code_id, pair_code_id),
-        HandleMsg::CreatePair {
-            asset_infos,
-            init_hook,
-        } => try_create_pair(deps, env, asset_infos, init_hook),
+        HandleMsg::UpdateConfig {owner, token_code_id,  pair_code_id, } => try_update_config(deps, env, owner, token_code_id, pair_code_id),
+        HandleMsg::CreatePair {  asset_infos,  init_hook, } => try_create_pair(deps, env, asset_infos, init_hook),
         HandleMsg::Register { asset_infos } => try_register(deps, env, asset_infos),
     }
 }
 
 // Only owner can execute it
-pub fn try_update_config<S: Storage, A: Api, Q: Querier>(
-    deps: &mut Extern<S, A, Q>,
-    env: Env,
-    owner: Option<HumanAddr>,
-    token_code_id: Option<u64>,
-    pair_code_id: Option<u64>,
-) -> HandleResult {
+pub fn try_update_config<S: Storage, A: Api, Q: Querier>(  deps: &mut Extern<S, A, Q>,  env: Env,  owner: Option<HumanAddr>,  token_code_id: Option<u64>,  pair_code_id: Option<u64>,) -> HandleResult {
     let mut config: Config = read_config(&deps.storage)?;
 
     // permission check
@@ -97,20 +76,15 @@ pub fn try_update_config<S: Storage, A: Api, Q: Querier>(
 
 #[allow(clippy::too_many_arguments)]
 // Anyone can execute it to create swap pair
-pub fn try_create_pair<S: Storage, A: Api, Q: Querier>(
-    deps: &mut Extern<S, A, Q>,
-    env: Env,
-    asset_infos: [AssetInfo; 2],
-    init_hook: Option<InitHook>,
-) -> HandleResult {
+pub fn try_create_pair<S: Storage, A: Api, Q: Querier>(  deps: &mut Extern<S, A, Q>,  env: Env,  asset_infos: [AssetInfo; 2],  init_hook: Option<InitHook>,) -> HandleResult {
     let config: Config = read_config(&deps.storage)?;
     let raw_infos = [asset_infos[0].to_raw(&deps)?, asset_infos[1].to_raw(&deps)?];
+
     if read_pair(&deps.storage, &raw_infos).is_ok() {
         return Err(StdError::generic_err("Pair already exists"));
     }
 
-    store_pair(
-        &mut deps.storage,
+    store_pair( &mut deps.storage,
         &PairInfoRaw {
             liquidity_token: CanonicalAddr::default(),
             contract_addr: CanonicalAddr::default(),
@@ -153,11 +127,7 @@ pub fn try_create_pair<S: Storage, A: Api, Q: Querier>(
 }
 
 /// create pair execute this message
-pub fn try_register<S: Storage, A: Api, Q: Querier>(
-    deps: &mut Extern<S, A, Q>,
-    env: Env,
-    asset_infos: [AssetInfo; 2],
-) -> HandleResult {
+pub fn try_register<S: Storage, A: Api, Q: Querier>(  deps: &mut Extern<S, A, Q>,  env: Env, asset_infos: [AssetInfo; 2],) -> HandleResult {
     let raw_infos = [asset_infos[0].to_raw(&deps)?, asset_infos[1].to_raw(&deps)?];
     let pair_info: PairInfoRaw = read_pair(&deps.storage, &raw_infos)?;
     if pair_info.contract_addr != CanonicalAddr::default() {
@@ -166,8 +136,7 @@ pub fn try_register<S: Storage, A: Api, Q: Querier>(
 
     let pair_contract = env.message.sender;
     let liquidity_token = query_liquidity_token(&deps, &pair_contract)?;
-    store_pair(
-        &mut deps.storage,
+    store_pair(&mut deps.storage,
         &PairInfoRaw {
             contract_addr: deps.api.canonical_address(&pair_contract)?,
             liquidity_token: deps.api.canonical_address(&liquidity_token)?,
@@ -185,10 +154,7 @@ pub fn try_register<S: Storage, A: Api, Q: Querier>(
     })
 }
 
-pub fn query<S: Storage, A: Api, Q: Querier>(
-    deps: &Extern<S, A, Q>,
-    msg: QueryMsg,
-) -> StdResult<Binary> {
+pub fn query<S: Storage, A: Api, Q: Querier>(  deps: &Extern<S, A, Q>,  msg: QueryMsg,) -> StdResult<Binary> {
     match msg {
         QueryMsg::Config {} => to_binary(&query_config(deps)?),
         QueryMsg::Pair { asset_infos } => to_binary(&query_pair(deps, asset_infos)?),
@@ -198,9 +164,7 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
     }
 }
 
-pub fn query_config<S: Storage, A: Api, Q: Querier>(
-    deps: &Extern<S, A, Q>,
-) -> StdResult<ConfigResponse> {
+pub fn query_config<S: Storage, A: Api, Q: Querier>( deps: &Extern<S, A, Q>,) -> StdResult<ConfigResponse> {
     let state: Config = read_config(&deps.storage)?;
     let resp = ConfigResponse {
         owner: deps.api.human_address(&state.owner)?,
@@ -211,20 +175,13 @@ pub fn query_config<S: Storage, A: Api, Q: Querier>(
     Ok(resp)
 }
 
-pub fn query_pair<S: Storage, A: Api, Q: Querier>(
-    deps: &Extern<S, A, Q>,
-    asset_infos: [AssetInfo; 2],
-) -> StdResult<PairInfo> {
+pub fn query_pair<S: Storage, A: Api, Q: Querier>(  deps: &Extern<S, A, Q>, asset_infos: [AssetInfo; 2],) -> StdResult<PairInfo> {
     let raw_infos = [asset_infos[0].to_raw(&deps)?, asset_infos[1].to_raw(&deps)?];
     let pair_info: PairInfoRaw = read_pair(&deps.storage, &raw_infos)?;
     pair_info.to_normal(&deps)
 }
 
-pub fn query_pairs<S: Storage, A: Api, Q: Querier>(
-    deps: &Extern<S, A, Q>,
-    start_after: Option<[AssetInfo; 2]>,
-    limit: Option<u32>,
-) -> StdResult<PairsResponse> {
+pub fn query_pairs<S: Storage, A: Api, Q: Querier>( deps: &Extern<S, A, Q>, start_after: Option<[AssetInfo; 2]>, limit: Option<u32>,) -> StdResult<PairsResponse> {
     let start_after = if let Some(start_after) = start_after {
         Some([start_after[0].to_raw(&deps)?, start_after[1].to_raw(&deps)?])
     } else {
@@ -237,10 +194,6 @@ pub fn query_pairs<S: Storage, A: Api, Q: Querier>(
     Ok(resp)
 }
 
-pub fn migrate<S: Storage, A: Api, Q: Querier>(
-    _deps: &mut Extern<S, A, Q>,
-    _env: Env,
-    _msg: MigrateMsg,
-) -> MigrateResult {
+pub fn migrate<S: Storage, A: Api, Q: Querier>( _deps: &mut Extern<S, A, Q>,  _env: Env,  _msg: MigrateMsg,) -> MigrateResult {
     Ok(MigrateResponse::default())
 }

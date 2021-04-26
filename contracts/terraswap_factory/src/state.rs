@@ -29,21 +29,14 @@ pub fn store_pair<S: Storage>(storage: &mut S, data: &PairInfoRaw) -> StdResult<
     asset_infos.sort_by(|a, b| a.as_bytes().cmp(&b.as_bytes()));
 
     let mut pair_bucket: Bucket<S, PairInfoRaw> = Bucket::new(PREFIX_PAIR_INFO, storage);
-    pair_bucket.save(
-        &[asset_infos[0].as_bytes(), asset_infos[1].as_bytes()].concat(),
-        &data,
-    )
+    pair_bucket.save( &[asset_infos[0].as_bytes(), asset_infos[1].as_bytes()].concat(), &data, )
 }
 
-pub fn read_pair<S: Storage>(
-    storage: &S,
-    asset_infos: &[AssetInfoRaw; 2],
-) -> StdResult<PairInfoRaw> {
+pub fn read_pair<S: Storage>(  storage: &S,  asset_infos: &[AssetInfoRaw; 2],) -> StdResult<PairInfoRaw> {
     let mut asset_infos = asset_infos.clone().to_vec();
     asset_infos.sort_by(|a, b| a.as_bytes().cmp(&b.as_bytes()));
 
-    let pair_bucket: ReadonlyBucket<S, PairInfoRaw> =
-        ReadonlyBucket::new(PREFIX_PAIR_INFO, storage);
+    let pair_bucket: ReadonlyBucket<S, PairInfoRaw> = ReadonlyBucket::new(PREFIX_PAIR_INFO, storage);
     match pair_bucket.load(&[asset_infos[0].as_bytes(), asset_infos[1].as_bytes()].concat()) {
         Ok(v) => Ok(v),
         Err(_e) => Err(StdError::generic_err("no pair data stored")),
